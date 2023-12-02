@@ -1,4 +1,6 @@
-#version 410
+#version 300 es
+
+precision mediump float;
 
 in vec3 fragN;
 in vec3 fragL;
@@ -6,14 +8,13 @@ in vec3 fragV;
 in vec2 fragTexCoord;
 in vec3 fragPObj;
 in vec3 fragNObj;
-// Material properties
-in vec4 Ka;
-in vec4 Kd;
-in vec4 Ks;
-in float shininess;
 
 // Light properties
 uniform vec4 Ia, Id, Is;
+
+// Material properties
+uniform vec4 Ka, Kd, Ks;
+uniform float shininess;
 
 // Diffuse texture sampler
 uniform sampler2D diffuseTex;
@@ -56,33 +57,73 @@ vec2 PlanarMappingX(vec3 P) { return vec2(1.0 - P.z, P.y); }
 vec2 PlanarMappingY(vec3 P) { return vec2(P.x, 1.0 - P.z); }
 vec2 PlanarMappingZ(vec3 P) { return P.xy; }
 
+#define PI 3.14159265358979323846
+
+// Cylindrical mapping
+vec2 CylindricalMapping(vec3 P) {
+  float longitude = atan(P.x, P.z);
+  float height = P.y;
+
+  float u = longitude / (2.0 * PI) + 0.5;  // From [-pi, pi] to [0, 1]
+  float v = height - 0.5;                  // Base at y = -0.5
+
+  return vec2(u, v);
+}
+
+// Spherical mapping
+vec2 SphericalMapping(vec3 P) {
+  float longitude = atan(P.x, P.z);
+  float latitude = asin(P.y / length(P));
+
+  float u = longitude / (2.0 * PI) + 0.5;  // From [-pi, pi] to [0, 1]
+  float v = latitude / PI + 0.5;           // From [-pi/2, pi/2] to [0, 1]
+
+  return vec2(u, v);
+}
+
 void main() {
   vec4 color;
 
   if (mappingMode == 0) {
     // Triplanar mapping
 
+    // An offset to center the texture around the origin
+    vec3 offset = vec3(-0.5, -0.5, -0.5);    
+
     // Sample with x planar mapping
-    vec2 texCoord1 = PlanarMappingX(fragPObj);
+    vec2 texCoord1 = PlanarMappingX(fragPObj + offset);
     vec4 color1 = BlinnPhong(fragN, fragL, fragV, texCoord1);
 
     // Sample with y planar mapping
-    vec2 texCoord2 = PlanarMappingY(fragPObj);
+    vec2 texCoord2 = PlanarMappingY(fragPObj + offset);
     vec4 color2 = BlinnPhong(fragN, fragL, fragV, texCoord2);
 
     // Sample with z planar mapping
-    vec2 texCoord3 = PlanarMappingZ(fragPObj);
+    vec2 texCoord3 = PlanarMappingZ(fragPObj + offset);
     vec4 color3 = BlinnPhong(fragN, fragL, fragV, texCoord3);
 
     // Compute average based on normal
     vec3 weight = abs(normalize(fragNObj));
     color = color1 * weight.x + color2 * weight.y + color3 * weight.z;
+  } else {
+    vec2 texCoord;
+    if (mappingMode == 1) {
+      // Cylindrical mapping
+      texCoord = CylindricalMapping(fragPObj);
+    } else if (mappingMode == 2) {
+      // Spherical mapping
+      texCoord = SphericalMapping(fragPObj);
+    } else if (mappingMode == 3) {
+      // From mesh
+      texCoord = fragTexCoord;
+    }
+    color = BlinnPhong(fragN, fragL, fragV, texCoord);
   }
 
   if (gl_FrontFacing) {
     outColor = color;
   } else {
     float i = (color.r + color.g + color.b) / 3.0;
-    outColor = vec4(i, i, i, 1.0);
+    outColor = vec4(i, 0, 0, 1.0);
   }
 }

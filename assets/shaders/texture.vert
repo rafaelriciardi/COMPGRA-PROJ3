@@ -1,13 +1,8 @@
-#version 410
+#version 300 es
 
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inNormal;
 layout(location = 2) in vec2 inTexCoord;
-// Material properties
-layout(location = 3) in vec4 inKa;
-layout(location = 4) in vec4 inKd;
-layout(location = 5) in vec4 inKs;
-layout(location = 6) in float inShininess;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
@@ -22,11 +17,6 @@ out vec3 fragN;
 out vec2 fragTexCoord;
 out vec3 fragPObj;
 out vec3 fragNObj;
-// Material properties
-out vec4 Ka;
-out vec4 Kd;
-out vec4 Ks;
-out float shininess;
 
 void main() {
   vec3 P = (viewMatrix * modelMatrix * vec4(inPosition, 1.0)).xyz;
@@ -39,10 +29,6 @@ void main() {
   fragTexCoord = inTexCoord;
   fragPObj = inPosition;
   fragNObj = inNormal;
-  Ka = inKa;
-  Kd = inKd;
-  Ks = inKs;
-  shininess = inShininess;
 
   gl_Position = projMatrix * vec4(P, 1.0);
 }
