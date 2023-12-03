@@ -6,11 +6,6 @@
 #include "camera.hpp"
 #include "ground.hpp"
 
-struct Vertex {
-  glm::vec3 position;
-
-  friend bool operator==(Vertex const &, Vertex const &) = default;
-};
 
 class Window : public abcg::OpenGLWindow {
 protected:
