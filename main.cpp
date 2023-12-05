@@ -9,7 +9,7 @@ int main(int argc, char **argv) {
     window.setWindowSettings({
         .width = 600,
         .height = 600,
-        .title = "LookAt Camera",
+        .title = "Model Viewer (version 6)",
     });
 
     app.run(window);
@@ -19,5 +19,3 @@ int main(int argc, char **argv) {
   }
   return 0;
 }
-
-//teste

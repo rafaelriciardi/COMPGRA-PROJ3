@@ -88,7 +88,7 @@ void main() {
     // Triplanar mapping
 
     // An offset to center the texture around the origin
-    vec3 offset = vec3(-0.5, -0.5, -0.5);    
+    vec3 offset = vec3(-0.5, -0.5, -0.5);
 
     // Sample with x planar mapping
     vec2 texCoord1 = PlanarMappingX(fragPObj + offset);
