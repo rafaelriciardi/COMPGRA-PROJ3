@@ -25,7 +25,7 @@ Para geração do skybox utilizando a técnica de cube mapping, buscamos por uma
 Conversor panorama para cubemap: https://jaxry.github.io/panorama-to-cubemap/
 
 <p align="center">
-  <img src="https://github.com/rafaelriciardi/COMPGRA-PROJ3/blob/main/img/print_convesor.png"/>
+  <img src="https://github.com/rafaelriciardi/COMPGRA-PROJ3/blob/main/img/print_conversor.png"/>
 </p>
 
 ### Alterações em window.hpp
