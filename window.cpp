@@ -191,7 +191,6 @@ void Window::onPaint() {
   }
 
   abcg::glUseProgram(0);
-  
   renderSkybox();
 
 }
@@ -237,7 +236,7 @@ void Window::onPaintUI() {
 
   // Create main window widget
   {
-    auto widgetSize{ImVec2(222, 190)};
+    auto widgetSize{ImVec2(222, 160)};
 
     if (!m_model.isUVMapped()) {
       // Add extra space for static text
@@ -366,33 +365,6 @@ void Window::onPaintUI() {
       }
     }
 
-    if (!m_model.isUVMapped()) {
-      ImGui::TextColored(ImVec4(1, 1, 0, 1), "Mesh has no UV coords.");
-    }
-
-    // UV mapping box
-    {
-      std::vector<std::string> comboItems{"Triplanar", "Cylindrical",
-                                          "Spherical"};
-
-      if (m_model.isUVMapped())
-        comboItems.emplace_back("From mesh");
-
-      ImGui::PushItemWidth(120);
-      if (ImGui::BeginCombo("UV mapping",
-                            comboItems.at(m_mappingMode).c_str())) {
-        for (auto const index : iter::range(comboItems.size())) {
-          auto const isSelected{m_mappingMode == static_cast<int>(index)};
-          if (ImGui::Selectable(comboItems.at(index).c_str(), isSelected))
-            m_mappingMode = index;
-          if (isSelected)
-            ImGui::SetItemDefaultFocus();
-        }
-        ImGui::EndCombo();
-      }
-      ImGui::PopItemWidth();
-    }
-
     ImGui::End();
   }
 
@@ -442,7 +414,7 @@ void Window::onPaintUI() {
       m_mappingMode = 3;
     } else {
       // ...or triplanar mapping otherwise
-      m_mappingMode = 0;
+      m_mappingMode = 3;
     }
   }
 
