@@ -102,7 +102,6 @@ void Window::loadModel(std::string_view path) {
 }
 
 void Window::onPaint() {
-  // update();
 
   abcg::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -164,18 +163,19 @@ void Window::onPaint() {
 
   m_model.render(m_trianglesToDraw);
 
+  const float deltaTime{static_cast<float>(getDeltaTime())};
+
   for (const auto index : iter::range(m_numObjs)) {
     auto &position{m_objPositions.at(index)};
-    auto &rotation{m_objRotations.at(index)};
 
     if(angle<360.0f) {
-      angle = angle + 0.001f ;
+      angle +=  deltaTime * 3.0f ;
     } else {
       angle = 0;
     }
 
     // Z coordinate increases by 10 units per second
-    position.z += 0.001f;
+    position.z += deltaTime * 1.0f;
 
 
     // Compute model matrix of the current obj
@@ -191,10 +191,9 @@ void Window::onPaint() {
   }
 
   abcg::glUseProgram(0);
+  
+  renderSkybox();
 
-  if (m_currentProgramIndex == 0 || m_currentProgramIndex == 1) {
-    renderSkybox();
-  }
 }
 
 void Window::onUpdate() {
@@ -544,28 +543,3 @@ void Window::destroySkybox() const {
   abcg::glDeleteVertexArrays(1, &m_skyVAO);
 }
 
-void Window::update() {
-  const float deltaTime{static_cast<float>(getDeltaTime())};
-
-  m_modelMatrix = m_trackBallModel.getRotation();
-
-  m_viewMatrix =
-      glm::lookAt(glm::vec3(0.0f, 0.0f, 2.0f + m_zoom),
-                  glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-  // Update objs
-  for (const auto index : iter::range(m_numObjs)) {
-    auto &position{m_objPositions.at(index)};
-    auto &rotation{m_objRotations.at(index)};
-
-    // Z coordinate increases by 10 units per second
-    position.z += deltaTime * 3.0f;
-
-    // If this crab is behind the camera, select a new random position and
-    // orientation, and move it back to -100
-    if (position.z > 0.1f) {
-      randomNewObj(position, rotation);
-      position.z = -10.0f;  // Back to -100
-    }
-  }
-}

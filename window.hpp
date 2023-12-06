@@ -59,7 +59,7 @@ private:
   GLuint m_skyProgram{};
 
   std::default_random_engine m_randomEngine;
-  static const int m_numObjs{99};
+  static const int m_numObjs{100};
 
   std::array<glm::vec3, m_numObjs> m_objPositions;
   std::array<glm::vec3, m_numObjs> m_objRotations;
