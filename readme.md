@@ -15,7 +15,7 @@ Link para a aplicação: XXXXXXXXXXXXXXXXXXXXXXXXX
 Essa representação visual proporciona uma visão interativa e educativa sobre o problema do lixo espacial, permitindo ao usuário explorar a dinâmica e a distribuição dos detritos orbitais no espaço. O programa visa conscientizar sobre a importância da gestão sustentável de satélites e resíduos espaciais.
 
 <p align="center">
-  <img src="https://github.com/Kevin-Sakaguti/COMPGRA-PROJ2/blob/main/imgs/montain_view.png"/>
+  <img src="https://github.com/rafaelriciardi/COMPGRA-PROJ3/blob/main/img/print_proj.png"/>
 </p>
 
 ## Definição do ambiente
