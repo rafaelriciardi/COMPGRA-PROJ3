@@ -19,115 +19,80 @@ Essa representação visual proporciona uma visão interativa e educativa sobre 
 </p>
 
 ## Definição do ambiente
-### Alterações em ground.cpp:
+### Alterações em window.hpp
 
-EM "void Ground::create(GLuint program)" foi alterado os parametros para diminuir o tamanho dos quadrados da malha.
-```
-  std::array<glm::vec3, 8> vertices{{{-0.1f, 0.0f, +0.1f},
-                                     {-0.1f, 0.0f, -0.1f},
-                                     {+0.1f, 0.0f, +0.1f},
-                                     {+0.1f, 0.0f, -0.1f}}};
-```
-Dado esta alteração em "paint" tivemos que dividir as translações da malha por 5 também, pois da maneira que estava os quadrados das malhas estavam separados.
-```
-model = glm::translate(model, glm::vec3(x/5.0f, height, z/5.0f));
-```
-Para fazer as montanhas e lagos foi aplicado uma função senoide em relação a X e Z.
-```
-float height = amplitude * std::sin(frequency * x + phase) * std::sin(frequency * z + phase);
-```
-E como queriamos as alturas em função de 0.1 aplicamos a seguinte formula para a senoide se tornar discreta e não continua.
-```
-  height = std::round(height / 0.1f) * 0.1f;
-```
-por fim, adicionamos o parametro de altura ("height") na função de translação.
-```
-model = glm::translate(model, glm::vec3(x/5.0f, height, z/5.0f));
-```
-Para dar o aspecto de montanha aplicamos a cor verde no nas alturas medianas acima de 0, para os picos da montanha aplicamos a cor branca e para os lagos a cor azul, ainda no "paint"
-```
-if(height < 0){
-  abcg::glUniform4f(m_colorLoc, 0.0f, 0.0f, 0.75f, 1.0f); 
-}
-else if (height > 0.7) {
-  abcg::glUniform4f(m_colorLoc, 1.0f, 1.0f, 1.0f, 1.0f); 
-}
-else {
-  abcg::glUniform4f(m_colorLoc, 0.0f, 1.0f, 0.0f, 1.0f);
-}
-```
-### Alterações em "onPaint":
+No window.hpp foi definido algumas variaveis e constantes. São eles:
 
-Em onPaint, foi alterado a criação das figuras, colocamos cubos para serem observados. E estes cubos em constante rotação no eixo X e Y.
 ```
-if(angle<360.0f) {
-    angle = angle + 15.0f ;
-  } else {
-    angle = 0;
-  }
+static const int m_numObjs{100};
+```
+Que foi usado para definir a quantidade de satélites que serão gerados 
 
-  glm::mat4 model{1.0f};
-  model = glm::translate(model, glm::vec3(0.0f, 0.5f, 0.0f));
-  model = glm::rotate(model, glm::radians(angle), glm::vec3(1, 1, 0));
-  model = glm::scale(model, glm::vec3(0.1f));
-  abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
-  abcg::glUniform4f(m_colorLocation, 0.5f, -1.0f, 0.0f, 1.0f);
-  abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,nullptr);
+```
+float m_angle{};
+float angle;
+```
+Que são utilizados para rotacionar o satélite principal e rotacionar também os satelites que são gerados aleatoriamente
+
+```
+std::default_random_engine m_randomEngine;
+```
+Para gerar aleatoriamente a posição dos satelites que "voam" pelo mapa
+
+### Alterações em window.cpp
+
+Alteração do model (arquivo obj) em "onCreate()"
+```
+  // Load default model
+  loadModel(assetsPath + "satellite.obj");
 ```
 
+Criação de uma classe "randomNewObj()" onde é gerado valores aleatorios de posição X, Y e Z, para geração dos objetos.
 
-## Definição da movimentação
-
-### Modo de voo
-Para implementar o modo de voo, foram atribuídas funções às teclas LSHIF (subir) e LCTRL (descer).
 ```
-if (event.key.keysym.sym == SDLK_LSHIFT)
-  m_flySpeed = 2.0f;
-if (event.key.keysym.sym == SDLK_LCTRL)
-  m_flySpeed = -2.0f;
-```
+void Window::randomNewObj(glm::vec3 &position, glm::vec3 &rotation) {
+  // Get random position
+  // x and y coordinates in the range [-20, 20]
+  // z coordinates in the range [-100, 0]
+  std::uniform_real_distribution<float> distPosXY(-2.0f, 2.0f);
+  std::uniform_real_distribution<float> distPosZ(-50.0f, 0.0f);
 
-Assim como as outras funções, a função de voo é chamada da atualizada pela seguinte chamada:
-```
-m_camera.fly(m_flySpeed * deltaTime);
-```
+  position = glm::vec3(distPosXY(m_randomEngine), distPosXY(m_randomEngine),
+                       distPosZ(m_randomEngine));
 
-E seu funcionamento utiliza como base um vetor fixo (0,1,0) que quando multiplicado pela velocidade e somado às posições anteriores de posição da camera e lookat, realiza o deslocamento do espectador na posição horizontal.
-```
-void Camera::fly(float speed) {
-  // Instantiate height modifier vector
-  glm::vec3 height_modifier{0.0f, 1.0f, 0.0f};
+  //  Get random rotation axis
+  std::uniform_real_distribution<float> distRotAxis(-1.0f, 1.0f);
 
-  // Move eye and lookat point based on height modifier and speed
-  m_eye += height_modifier * speed;
-  m_at += height_modifier * speed;
-
-  computeViewMatrix();
+  rotation = glm::normalize(glm::vec3(distRotAxis(m_randomEngine),
+                                      distRotAxis(m_randomEngine),
+                                      distRotAxis(m_randomEngine)));
 }
 ```
 
-
-Para melhorar a visualização no modo voo, também foram alteradas a distância de renderização e o fator de sombreamento de objetivos distantes.
-
-### Rotação da câmera
-Para deixar a movimentação mais fluida para o usuário e proporcionar uma melhor experiência de interação, alteramos os comandos de **pan** para as setas esquerda e direita do teclado e atribuimos uma nova função às setas cima e baixo.
+Alteração de "onPaint", onde foi adicionado a rotação dos objetos aleatorios, em função de 'deltaTime', e os objetos foram configurados para rodacionar em x e z em função de "angle"
 ```
-if (event.key.keysym.sym == SDLK_UP)
-  m_cameraSpeed = 2.0f;
-if (event.key.keysym.sym == SDLK_DOWN)
-  m_cameraSpeed = -2.0f;
+for (const auto index : iter::range(m_numObjs)) {
+    auto &position{m_objPositions.at(index)};
+
+    if(angle<360.0f) {
+      angle +=  deltaTime * 3.0f ;
+    } else {
+      angle = 0;
+    }
+
+    // Z coordinate increases by 10 units per second
+    position.z += deltaTime * 1.0f;
+
+
+    // Compute model matrix of the current obj
+    glm::mat4 modelMatrix{1.0f};
+    modelMatrix = glm::translate(modelMatrix, position);
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2f));
+    modelMatrix = glm::rotate(modelMatrix, glm::radians(angle), glm::vec3(1, 0, 1));
+
 ```
+Além disso, tiramos as condições do cubeMapping "renderSkyBox()" para que o cubemapping esteja ativado independente do Shader ou Texture.
 
-Para que o jogador consigar olhar para cima e para baixo quando estiver voando, criamos essa nova função, que inclusive pode ser combinada na movimentação com as teclas wasd para voar de uma forma única pelo cenário.
 ```
-void Camera::cameraFlyView(float speed) {
-// Instantiate view_modifier vector
-glm::vec3 view_modifier{0.0f, 1.0f, 0.0f};
-
-// Move de lookat point based on the modifier and speed
-m_at += view_modifier * speed;
-
-computeViewMatrix();
-}
+  renderSkybox();
 ```
-
