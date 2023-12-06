@@ -69,7 +69,7 @@ void Window::randomNewObj(glm::vec3 &position, glm::vec3 &rotation) {
 }
 ```
 
-Alteração de "onPaint", onde foi adicionado a rotação dos objetos aleatorios, em função de 'deltaTime', e os objetos foram configurados para rodacionar em x e z em função de "angle"
+Alteração de "onPaint", onde foi adicionado a rotação dos objetos aleatorios, em função de 'deltaTime', e os objetos foram configurados para rodacionar em x e z em função de "angle". além da geração de "m_numObjs" objetos em um looping de repetição. 
 ```
 for (const auto index : iter::range(m_numObjs)) {
     auto &position{m_objPositions.at(index)};
@@ -89,6 +89,7 @@ for (const auto index : iter::range(m_numObjs)) {
     modelMatrix = glm::translate(modelMatrix, position);
     modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2f));
     modelMatrix = glm::rotate(modelMatrix, glm::radians(angle), glm::vec3(1, 0, 1));
+}
 
 ```
 Além disso, tiramos as condições do cubeMapping "renderSkyBox()" para que o cubemapping esteja ativado independente do Shader ou Texture.
