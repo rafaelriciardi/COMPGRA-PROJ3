@@ -60,11 +60,11 @@ void Window::onCreate() {
     auto &position{m_objPositions.at(index)};
     auto &rotation{m_objRotations.at(index)};
 
-    randomObj(position, rotation);
+    randomNewObj(position, rotation);
   }
 }
 
-void Window::randomObj(glm::vec3 &position, glm::vec3 &rotation) {
+void Window::randomNewObj(glm::vec3 &position, glm::vec3 &rotation) {
   // Get random position
   // x and y coordinates in the range [-20, 20]
   // z coordinates in the range [-100, 0]
@@ -102,7 +102,7 @@ void Window::loadModel(std::string_view path) {
 }
 
 void Window::onPaint() {
-  update();
+  // update();
 
   abcg::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -165,14 +165,17 @@ void Window::onPaint() {
   m_model.render(m_trianglesToDraw);
 
   for (const auto index : iter::range(m_numObjs)) {
-    const auto &position{m_objPositions.at(index)};
-    const auto &rotation{m_objRotations.at(index)};
+    auto &position{m_objPositions.at(index)};
+    auto &rotation{m_objRotations.at(index)};
 
     if(angle<360.0f) {
       angle = angle + 0.001f ;
     } else {
       angle = 0;
     }
+
+    // Z coordinate increases by 10 units per second
+    position.z += 0.001f;
 
 
     // Compute model matrix of the current obj
@@ -555,21 +558,13 @@ void Window::update() {
     auto &position{m_objPositions.at(index)};
     auto &rotation{m_objRotations.at(index)};
 
-    // rotation.y += deltaTime * 10.0f;
-
-    // if(rotation.y>=360.0f) {
-    //   rotation.y = rotation.y - 360.0f;
-    // }
-    
-    
-
     // Z coordinate increases by 10 units per second
     position.z += deltaTime * 3.0f;
 
     // If this crab is behind the camera, select a new random position and
     // orientation, and move it back to -100
     if (position.z > 0.1f) {
-      randomObj(position, rotation);
+      randomNewObj(position, rotation);
       position.z = -10.0f;  // Back to -100
     }
   }

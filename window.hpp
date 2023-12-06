@@ -89,7 +89,7 @@ private:
       {-1, -1, -1}, {+1, -1, +1}, {-1, -1, +1}}};
   // clang-format on
 
-  void randomObj(glm::vec3 &position, glm::vec3 &rotation);
+  void randomNewObj(glm::vec3 &position, glm::vec3 &rotation);
   void createSkybox();
   void renderSkybox();
   void destroySkybox() const;
