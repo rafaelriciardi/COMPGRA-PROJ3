@@ -8,7 +8,7 @@ O programa é desenvolvido em C++, se trata de uma um mapa 3D que simula o lixo 
 
 O projeto foi inspirado no "viewer6", onde ele cria um objeto, mapeia diferentes shaders de reflexão e textura no proprio objeto. Além do mapeamento do objeto, também é feito um cube mapping com uma imagem espacial.
 
-Link para a aplicação: XXXXXXXXXXXXXXXXXXXXXXXXX
+Link para a aplicação: https://rafaelriciardi.github.io/COMPGRA-PROJ3/
 
 ## O Projeto:
 
@@ -19,6 +19,15 @@ Essa representação visual proporciona uma visão interativa e educativa sobre 
 </p>
 
 ## Definição do ambiente
+### Cube mapping
+Para geração do skybox utilizando a técnica de cube mapping, buscamos por uma imagem do espaço, com boa qualidade, e que fosse do tipo panorama e com aspect ratio 2:1. Esses parâmetros eram importantes para geração das referências do cubo com uma boa qualidade utilizando o conversor online apresentado a seguir.
+
+Conversor panorama para cubemap: https://jaxry.github.io/panorama-to-cubemap/
+
+<p align="center">
+  <img src="https://github.com/rafaelriciardi/COMPGRA-PROJ3/blob/main/img/print_convesor.png"/>
+</p>
+
 ### Alterações em window.hpp
 
 No window.hpp foi definido algumas variaveis e constantes. São eles:
